@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkillProof | Own Your Credentials</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.5.2/dist/web3.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background-color: #0f0a19;
+            color: white;
+            min-height: 100vh;
+        }
+        
+        .gradient-text {
+            background: linear-gradient(90deg, #8a2be2 0%, #00bfff 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .gradient-border {
+            border: 2px solid transparent;
+            background: linear-gradient(#0f0a19, #0f0a19) padding-box,
+                        linear-gradient(90deg, #8a2be2 0%, #00bfff 100%) border-box;
+            border-radius: 0.5rem;
+        }
+        
+        .neon-shadow {
+            box-shadow: 0 0 15px rgba(0, 191, 255, 0.3);
+        }
+        
+        .neon-shadow-purple {
+            box-shadow: 0 0 15px rgba(138, 43, 226, 0.3);
+        }
+        
+        .skill-card:hover {
+            transform: translateY(-5px);
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar-item:hover {
+            background: rgba(138, 43, 226, 0.1);
+        }
+        
+        .progress-bar {
+            background: linear-gradient(90deg, #8a2be2 0%, #00bfff 100%);
+        }
+        
+        .heatmap-day {
+            background-color: rgba(0, 191, 255, 0.1);
+            border: 1px solid rgba(0, 191, 255, 0.3);
+        }
+        
+        .heatmap-day.active {
+            background-color: rgba(0, 191, 255, 0.7);
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-black bg-opacity-50 backdrop-blur-md border-b border-purple-900 fixed w-full z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <span class="text-2xl font-bold gradient-text">SkillProof</span>
+                    </div>
+                    <div class="hidden md:block">
+                        <div class="ml-10 flex items-baseline space-x-4">
+                            <a href="#home" class="text-white hover:text-blue-400 px-3 py-2 rounded-md text-sm font-medium">Home</a>
+                            <a href="#how-it-works" class="text-white hover:text-blue-400 px-3 py-2 rounded-md text-sm font-medium">How It Works</a>
+                            <a href="#benefits" class="text-white hover:text-blue-400 px-3 py-2 rounded-md text-sm font-medium">Benefits</a>
+                            <a href="#blockchains" class="text-white hover:text-blue-400 px-3 py-2 rounded-md text-sm font-medium">Blockchains</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="hidden md:block">
+                    <button id="connectWalletBtn" class="gradient-border px-4 py-2 rounded-md text-white font-medium hover:neon-shadow transition-all">
+                        Connect Wallet
+                    </button>
+                </div>
+                <div class="-mr-2 flex md:hidden">
+                    <button id="mobileMenuBtn" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none">
+                        <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile menu -->
+        <div id="mobileMenu" class="md:hidden hidden">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="#home" class="text-white block px-3 py-2 rounded-md text-base font-medium">Home</a>
+                <a href="#how-it-works" class="text-white block px-3 py-2 rounded-md text-base font-medium">How It Works</a>
+                <a href="#benefits" class="text-white block px-3 py-2 rounded-md text-base font-medium">Benefits</a>
+                <a href="#blockchains" class="text-white block px-3 py-2 rounded-md text-base font-medium">Blockchains</a>
+                <button id="connectWalletBtnMobile" class="gradient-border px-4 py-2 rounded-md text-white font-medium w-full mt-2">
+                    Connect Wallet
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main>
+        <!-- Home Section -->
+        <section id="home" class="pt-32 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+            <div class="text-center">
+                <h1 class="text-4xl md:text-6xl font-bold mb-6">
+                    <span class="gradient-text">Prove Your Skills,</span><br>
+                    <span class="text-white">Own Your Credentials</span>
+                </h1>
+                <p class="text-xl text-gray-300 max-w-3xl mx-auto mb-10">
+                    SkillProof transforms your technical skills into verifiable, non-transferable NFTs that you truly own. Showcase your expertise to employers and peers with blockchain-powered credentials.
+                </p>
+                <button id="heroConnectBtn" class="gradient-border px-8 py-4 rounded-lg text-white font-bold text-lg hover:neon-shadow transition-all mb-16">
+                    Connect Wallet to View Dashboard
+                </button>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16">
+                    <div class="gradient-border p-6 rounded-lg hover:neon-shadow transition-all">
+                        <div class="text-blue-400 text-4xl mb-4">
+                            <i class="fas fa-fingerprint"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2">Soulbound Tokens</h3>
+                        <p class="text-gray-300">Your credentials are permanently tied to your wallet and cannot be transferred or sold.</p>
+                    </div>
+                    <div class="gradient-border p-6 rounded-lg hover:neon-shadow transition-all">
+                        <div class="text-purple-400 text-4xl mb-4">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2">Tamper-Proof</h3>
+                        <p class="text-gray-300">All credentials are stored on-chain with cryptographic proof of authenticity.</p>
+                    </div>
+                    <div class="gradient-border p-6 rounded-lg hover:neon-shadow transition-all">
+                        <div class="text-blue-400 text-4xl mb-4">
+                            <i class="fas fa-globe"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2">Global Standard</h3>
+                        <p class="text-gray-300">Recognized by employers and institutions worldwide as proof of your skills.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- How It Works Section -->
+        <section id="how-it-works" class="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4">
+                    <span class="gradient-text">How SkillProof Works</span>
+                </h2>
+                <p class="text-xl text-gray-300 max-w-3xl mx-auto">
+                    A simple three-step process to mint, manage, and showcase your verifiable credentials.
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="relative">
+                    <div class="gradient-border p-6 rounded-lg h-full">
+                        <div class="absolute -top-5 -left-5 bg-purple-900 rounded-full w-10 h-10 flex items-center justify-center text-white font-bold">1</div>
+                        <h3 class="text-xl font-bold mb-4">Connect Your Wallet</h3>
+                        <p class="text-gray-300 mb-4">Link your Ethereum wallet (like MetaMask) to create your decentralized identity.</p>
+                        <div class="text-blue-400 text-2xl">
+                            <i class="fab fa-ethereum"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="relative">
+                    <div class="gradient-border p-6 rounded-lg h-full">
+                        <div class="absolute -top-5 -left-5 bg-purple-900 rounded-full w-10 h-10 flex items-center justify-center text-white font-bold">2</div>
+                        <h3 class="text-xl font-bold mb-4">Mint Your Skills</h3>
+                        <p class="text-gray-300 mb-4">Upload proof of your skills through assessments or code repositories to mint credentials.</p>
+                        <div class="text-blue-400 text-2xl">
+                            <i class="fas fa-certificate"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="relative">
+                    <div class="gradient-border p-6 rounded-lg h-full">
+                        <div class="absolute -top-5 -left-5 bg-purple-900 rounded-full w-10 h-10 flex items-center justify-center text-white font-bold">3</div>
+                        <h3 class="text-xl font-bold mb-4">Share & Verify</h3>
+                        <p class="text-gray-300 mb-4">Share your profile with employers who can instantly verify your credentials on-chain.</p>
+                        <div class="text-blue-400 text-2xl">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Benefits Section -->
+        <section id="benefits" class="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto bg-gradient-to-b from-purple-900/10 to-transparent rounded-3xl">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4">
+                    <span class="gradient-text">Why Choose SkillProof?</span>
+                </h2>
+                <p class="text-xl text-gray-300 max-w-3xl mx-auto">
+                    The future of verifiable credentials is decentralized, transparent, and user-owned.
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="gradient-border p-8 rounded-lg">
+                    <div class="flex items-start mb-6">
+                        <div class="text-blue-400 text-3xl mr-4">
+                            <i class="fas fa-user-shield"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold mb-2">Own Your Data</h3>
+                            <p class="text-gray-300">Traditional platforms own and control your credential data. With SkillProof, you maintain complete ownership through your crypto wallet.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="gradient-border p-8 rounded-lg">
+                    <div class="flex items-start mb-6">
+                        <div class="text-purple-400 text-3xl mr-4">
+                            <i class="fas fa-project-diagram"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold mb-2">Interoperable</h3>
+                            <p class="text-gray-300">Your credentials can be used across multiple platforms, job boards, and metaverse environments without vendor lock-in.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="gradient-border p-8 rounded-lg">
+                    <div class="flex items-start mb-6">
+                        <div class="text-blue-400 text-3xl mr-4">
+                            <i class="fas fa-search-dollar"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold mb-2">Employer Trust</h3>
+                            <p class="text-gray-300">Companies can instantly verify the authenticity of your credentials on-chain, reducing fraud and increasing trust.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="gradient-border p-8 rounded-lg">
+                    <div class="flex items-start mb-6">
+                        <div class="text-purple-400 text-3xl mr-4">
+                            <i class="fas fa-rocket"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold mb-2">Future-Proof</h3>
+                            <p class="text-gray-300">As Web3 adoption grows, your blockchain-based credentials will become increasingly valuable in the decentralized economy.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Supported Blockchains Section -->
+        <section id="blockchains" class="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4">
+                    <span class="gradient-text">Supported Blockchains</span>
+                </h2>
+                <p class="text-xl text-gray-300 max-w-3xl mx-auto">
+                    SkillProof credentials are available on multiple EVM-compatible networks.
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                <div class="gradient-border p-6 rounded-lg flex flex-col items-center hover:neon-shadow transition-all">
+                    <img src="https://cryptologos.cc/logos/polygon-matic-logo.png" alt="Polygon" class="h-16 mb-4">
+                    <h3 class="text-lg font-bold mb-2">Polygon</h3>
+                    <p class="text-gray-300 text-sm text-center">Low-cost, eco-friendly transactions</p>
+                </div>
+                <div class="gradient-border p-6 rounded-lg flex flex-col items-center hover:neon-shadow transition-all">
+                    <img src="https://cryptologos.cc/logos/ethereum-eth-logo.png" alt="Ethereum" class="h-16 mb-4">
+                    <h3 class="text-lg font-bold mb-2">Ethereum</h3>
+                    <p class="text-gray-300 text-sm text-center">Mainnet for maximum security</p>
+                </div>
+                <div class="gradient-border p-6 rounded-lg flex flex-col items-center hover:neon-shadow transition-all">
+                    <img src="https://cryptologos.cc/logos/optimism-ethereum-op-logo.png" alt="Optimism" class="h-16 mb-4">
+                    <h3 class="text-lg font-bold mb-2">Optimism</h3>
+                    <p class="text-gray-300 text-sm text-center">Scalable L2 solution</p>
+                </div>
+                <div class="gradient-border p-6 rounded-lg flex flex-col items-center hover:neon-shadow transition-all">
+                    <img src="https://cryptologos.cc/logos/arbitrum-arb-logo.png" alt="Arbitrum" class="h-16 mb-4">
+                    <h3 class="text-lg font-bold mb-2">Arbitrum</h3>
+                    <p class="text-gray-300 text-sm text-center">High-throughput network</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Testimonials Section -->
+        <section class="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto bg-gradient-to-b from-blue-900/10 to-transparent rounded-3xl">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4">
+                    <span class="gradient-text">What Our Community Says</span>
+                </h2>
+                <p class="text-xl text-gray-300 max-w-3xl mx-auto">
+                    Hear from developers, students, and employers using SkillProof.
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="gradient-border p-6 rounded-lg">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 rounded-full bg-purple-900 flex items-center justify-center text-xl font-bold mr-4">JS</div>
+                        <div>
+                            <h4 class="font-bold">Jamie Smith</h4>
+                            <p class="text-gray-400 text-sm">Full-Stack Developer</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-300">"SkillProof allowed me to showcase my React expertise in a way that employers actually trust. Landed my dream job at a Web3 startup!"</p>
+                </div>
+                <div class="gradient-border p-6 rounded-lg">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 rounded-full bg-blue-900 flex items-center justify-center text-xl font-bold mr-4">AL</div>
+                        <div>
+                            <h4 class="font-bold">Aisha Lopez</h4>
+                            <p class="text-gray-400 text-sm">Computer Science Student</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-300">"As a student, having verifiable credentials on-chain gives me a huge advantage when applying for internships and entry-level positions."</p>
+                </div>
+                <div class="gradient-border p-6 rounded-lg">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 rounded-full bg-purple-900 flex items-center justify-center text-xl font-bold mr-4">MR</div>
+                        <div>
+                            <h4 class="font-bold">Michael Roberts</h4>
+                            <p class="text-gray-400 text-sm">CTO, TechCorp</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-300">"We use SkillProof to verify candidates' skills before interviews. It's saved us countless hours and reduced hiring mistakes significantly."</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Dashboard (Hidden until wallet connected) -->
+        <div id="dashboardContainer" class="hidden fixed inset-0 bg-black bg-opacity-90 z-50 overflow-y-auto">
+            <div class="min-h-screen">
+                <div class="flex">
+                    <!-- Sidebar -->
+                    <div class="w-64 bg-black bg-opacity-50 border-r border-purple-900 min-h-screen p-4">
+                        <div class="flex items-center mb-10 mt-4">
+                            <span class="text-2xl font-bold gradient-text">SkillProof</span>
+                        </div>
+                        
+                        <div class="space-y-2">
+                            <a href="#" class="sidebar-item flex items-center p-3 rounded-lg text-white hover:text-blue-400" id="dashboardLink">
+                                <i class="fas fa-tachometer-alt mr-3"></i>
+                                Dashboard
+                            </a>
+                            <a href="#" class="sidebar-item flex items-center p-3 rounded-lg text-white hover:text-blue-400" id="credentialsLink">
+                                <i class="fas fa-certificate mr-3"></i>
+                                My Credentials
+                            </a>
+                            <a href="#" class="sidebar-item flex items-center p-3 rounded-lg text-white hover:text-blue-400" id="mintLink">
+                                <i class="fas fa-plus-circle mr-3"></i>
+                                Mint Skill
+                            </a>
+                            <a href="#" class="sidebar-item flex items-center p-3 rounded-lg text-white hover:text-blue-400" id="verifierLink">
+                                <i class="fas fa-check-double mr-3"></i>
+                                Verifier
+                            </a>
+                            <a href="#" class="sidebar-item flex items-center p-3 rounded-lg text-white hover:text-blue-400" id="profileLink">
+                                <i class="fas fa-user-circle mr-3"></i>
+                                Profile
+                            </a>
+                        </div>
+                        
+                        <div class="mt-20 pt-4 border-t border-purple-900">
+                            <div class="flex items-center p-3 rounded-lg">
+                                <div id="walletAvatar" class="w-10 h-10 rounded-full bg-purple-900 flex items-center justify-center text-sm font-bold mr-3"></div>
+                                <div>
+                                    <div id="walletAddress" class="text-sm text-gray-300 truncate">0x742...d35f</div>
+                                    <div class="text-xs text-blue-400">Connected</div>
+                                </div>
+                            </div>
+                            <button id="disconnectWalletBtn" class="w-full mt-4 gradient-border px-4 py-2 rounded-md text-white text-sm font-medium">
+                                Disconnect
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Main Content -->
+                    <div class="flex-1 p-8">
+                        <div class="flex justify-between items-center mb-8">
+                            <h2 class="text-3xl font-bold gradient-text" id="dashboardTitle">Dashboard</h2>
+                            <button id="closeDashboardBtn" class="text-gray-400 hover:text-white">
+                                <i class="fas fa-times text-2xl"></i>
+                            </button>
+                        </div>
+                        
+                        <!-- Dashboard Content -->
+                        <div id="dashboardContent">
+                            <div class="mb-8">
+                                <h3 class="text-xl font-bold mb-4">Welcome back, <span id="userName" class="gradient-text">User</span>!</h3>
+                                <p class="text-gray-300 mb-6">Here's your skill certification overview. You currently have <span class="text-blue-400 font-bold">4</span> verifiable credentials.</p>
+                                
+                                <div class="gradient-border p-6 rounded-lg mb-6">
+                                    <h4 class="text-lg font-bold mb-4">Skill Progress</h4>
+                                    <div class="mb-2 flex justify-between">
+                                        <span>Solidity</span>
+                                        <span>70%</span>
+                                    </div>
+                                    <div class="w-full bg-gray-800 rounded-full h-2.5 mb-4">
+                                        <div class="progress-bar h-2.5 rounded-full" style="width: 70%"></div>
+                                    </div>
+                                    <div class="mb-2 flex justify-between">
+                                        <span>React</span>
+                                        <span>90%</span>
+                                    </div>
+                                    <div class="w-full bg-gray-800 rounded-full h-2.5 mb-4">
+                                        <div class="progress-bar h-2.5 rounded-full" style="width: 90%"></div>
+                                    </div>
+                                    <div class="mb-2 flex justify-between">
+                                        <span>Rust</span>
+                                        <span>40%</span>
+                                    </div>
+                                    <div class="w-full bg-gray-800 rounded-full h-2.5">
+                                        <div class="progress-bar h-2.5 rounded-full" style="width: 40%"></div>
+                                    </div>
+                                </div>
+                                
+                                <div class="gradient-border p-6 rounded-lg">
+                                    <h4 class="text-lg font-bold mb-4">Learning Activity</h4>
+                                    <div class="grid grid-cols-7 gap-1 mb-4">
+                                        <!-- Heatmap days - this would be generated dynamically in a real app -->
+                                        <div class="heatmap-day w-6 h-6 rounded-sm"></div>
+                                        <div class="heatmap-day w-6 h-6 rounded-sm"></div>
+                                        <div class="heatmap-day active w-6 h-6 rounded-sm"></div>
+                                        <div class="heatmap-day active w-6 h-6 rounded-sm"></div>
+                                        <div class="heatmap-day w-6 h-6 rounded-sm"></div>
+                                        <div class="heatmap-day w-6 h-6 rounded-sm"></div>
+                                        <div class="heatmap-day active w-6 h-6 rounded-sm"></div>
+                                        <!-- More days would go here -->
+                                    </div>
+                                    <p class="text-gray-400 text-sm">You've been active 3 out of the last 7 days.</p>
+                                </div>
+                            </div>
+                            
+                            <h3 class="text-xl font-bold mb-4">Your Credentials</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                <!-- Credential Cards -->
+                                <div class="skill-card gradient-border p-6 rounded-lg hover:neon-shadow transition-all">
+                                    <div class="flex justify-between items-start mb-4">
+                                        <div>
+                                            <h4 class="text-lg font-bold">React Advanced</h4>
+                                            <p class="text-gray-400 text-sm">Issued: 15 Mar 2023</p>
+                                        </div>
+                                        <div class="text-blue-400 text-2xl">
+                                            <i class="fab fa-react"></i>
+                                        </div>
+                                    </div>
+                                    <p class="text-gray-300 mb-4">Advanced concepts including hooks, context API, and performance optimization.</p>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-sm bg-purple-900 bg-opacity-50 px-3 py-1 rounded-full">Level: Expert</span>
+                                        <button class="text-blue-400 hover:text-blue-300 text-sm font-medium">View Details</button>
+                                    </div>
+                                </div>
+                                
+                                <div class="skill-card gradient-border p-6 rounded-lg hover:neon-shadow transition-all">
+                                    <div class="flex justify-between items-start mb-4">
+                                        <div>
+                                            <h4 class="text-lg font-bold">Solidity</h4>
+                                            <p class="text-gray-400 text-sm">Issued: 2 Feb 2023</p>
+                                        </div>
+                                        <div class="text-blue-400 text-2xl">
+                                            <i class="fab fa-ethereum"></i>
+                                        </div>
+                                    </div>
+                                    <p class="text-gray-300 mb-4">Smart contract development with security best practices and gas optimization.</p>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-sm bg-purple-900 bg-opacity-50 px-3 py-1 rounded-full">Level: Intermediate</span>
+                                        <button class="text-blue-400 hover:text-blue-300 text-sm font-medium">View Details</button>
+                                    </div>
+                                </div>
+                                
+                                <div class="skill-card gradient-border p-6 rounded-lg hover:neon-shadow transition-all">
+                                    <div class="flex justify-between items-start mb-4">
+                                        <div>
+                                            <h4 class="text-lg font-bold">TypeScript</h4>
+                                            <p class="text-gray-400 text-sm">Issued: 10 Jan 2023</p>
+                                        </div>
+                                        <div class="text-blue-400 text-2xl">
+                                            <i class="fas fa-code"></i>
+                                        </div>
+                                    </div>
+                                    <p class="text-gray-300 mb-4">Strong typing, interfaces, and advanced TypeScript patterns for large-scale applications.</p>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-sm bg-purple-900 bg-opacity-50 px-3 py-1 rounded-full">Level: Advanced</span>
+                                        <button class="text-blue-400 hover:text-blue-300 text-sm font-medium">View Details</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Mint Skill Content -->
+                        <div id="mintContent" class="hidden">
+                            <h3 class="text-xl font-bold mb-6">Mint a New Skill Credential</h3>
+                            
+                            <div class="gradient-border p-8 rounded-lg max-w-2xl mx-auto">
+                                <div class="mb-6">
+                                    <label class="block text-gray-300 mb-2">Skill Category</label>
+                                    <select class="w-full bg-gray-900 border border-purple-900 rounded-md px-4 py-2 text-white">
+                                        <option>Select a category</option>
+                                        <option>Frontend Development</option>
+                                        <option>Backend Development</option>
+                                        <option>Blockchain/Smart Contracts</option>
+                                        <option>DevOps & Cloud</option>
+                                        <option>Data Science</option>
+                                        <option>Cybersecurity</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="mb-6">
+                                    <label class="block text-gray-300 mb-2">Specific Skill</label>
+                                    <input type="text" class="w-full bg-gray-900 border border-purple-900 rounded-md px-4 py-2 text-white" placeholder="e.g., React, Solidity, Python">
+                                </div>
+                                
+                                <div class="mb-6">
+                                    <label class="block text-gray-300 mb-2">Skill Level</label>
+                                    <div class="grid grid-cols-4 gap-4">
+                                        <button class="bg-gray-800 hover:bg-purple-900 text-white px-4 py-2 rounded-md text-sm">Beginner</button>
+                                        <button class="bg-gray-800 hover:bg-purple-900 text-white px-4 py-2 rounded-md text-sm">Intermediate</button>
+                                        <button class="bg-gray-800 hover:bg-purple-900 text-white px-4 py-2 rounded-md text-sm">Advanced</button>
+                                        <button class="bg-gray-800 hover:bg-purple-900 text-white px-4 py-2 rounded-md text-sm">Expert</button>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-6">
+                                    <label class="block text-gray-300 mb-2">Proof of Skill</label>
+                                    <div class="border-2 border-dashed border-purple-900 rounded-lg p-8 text-center">
+                                        <i class="fas fa-cloud-upload-alt text-4xl text-blue-400 mb-4"></i>
+                                        <p class="text-gray-400 mb-4">Upload assessment results, code repository, or certification</p>
+                                        <button class="gradient-border px-6 py-2 rounded-md text-white font-medium">Browse Files</button>
+                                        <p class="text-gray-500 text-sm mt-4">or drag and drop files here</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-6">
+                                    <label class="flex items-center">
+                                        <input type="checkbox" class="form-checkbox bg-gray-900 border-purple-900 text-blue-400">
+                                        <span class="ml-2 text-gray-300">I verify that this information is accurate and represents my own work</span>
+                                    </label>
+                                </div>
+                                
+                                <button class="w-full gradient-border px-6 py-3 rounded-md text-white font-bold hover:neon-shadow transition-all">
+                                    <i class="fas fa-certificate mr-2"></i> Mint Credential NFT
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Verifier Content -->
+                        <div id="verifierContent" class="hidden">
+                            <h3 class="text-xl font-bold mb-6">Credential Verifier</h3>
+                            
+                            <div class="gradient-border p-8 rounded-lg max-w-2xl mx-auto">
+                                <div class="mb-6">
+                                    <label class="block text-gray-300 mb-2">Wallet Address to Verify</label>
+                                    <input type="text" class="w-full bg-gray-900 border border-purple-900 rounded-md px-4 py-2 text-white" placeholder="0x742d35Cc6634C0532925a3b844Bc454e4438f44e">
+                                </div>
+                                
+                                <button class="w-full gradient-border px-6 py-3 rounded-md text-white font-bold mb-6 hover:neon-shadow transition-all">
+                                    <i class="fas fa-search mr-2"></i> Look Up Credentials
+                                </button>
+                                
+                                <div class="border-t border-purple-900 pt-6">
+                                    <h4 class="text-lg font-bold mb-4">Verification Results</h4>
+                                    
+                                    <div class="bg-gray-900 bg-opacity-50 p-4 rounded-lg mb-4">
+                                        <div class="flex justify-between items-center mb-2">
+                                            <div class="font-medium">React Advanced</div>
+                                            <div class="text-green-400 text-sm flex items-center">
+                                                <i class="fas fa-check-circle mr-1"></i> Verified
+                                            </div>
+                                        </div>
+                                        <div class="text-gray-400 text-sm mb-1">Issuer: Web3 University</div>
+                                        <div class="text-gray-400 text-sm">Minted: 15 Mar 2023</div>
+                                    </div>
+                                    
+                                    <div class="bg-gray-900 bg-opacity-50 p-4 rounded-lg mb-4">
+                                        <div class="flex justify-between items-center mb-2">
+                                            <div class="font-medium">Solidity</div>
+                                            <div class="text-green-400 text-sm flex items-center">
+                                                <i class="fas fa-check-circle mr-1"></i> Verified
+                                            </div>
+                                        </div>
+                                        <div class="text-gray-400 text-sm mb-1">Issuer: Ethereum Foundation</div>
+                                        <div class="text-gray-400 text-sm">Minted: 2 Feb 2023</div>
+                                    </div>
+                                    
+                                    <div class="text-center text-gray-400 py-8">
+                                        <i class="fas fa-lock text-3xl mb-2 text-blue-400"></i>
+                                        <p>All credentials are cryptographically verified on the blockchain</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Profile Content -->
+                        <div id="profileContent" class="hidden">
+                            <h3 class="text-xl font-bold mb-6">Your Profile</h3>
+                            
+                            <div class="gradient-border p-8 rounded-lg max-w-2xl mx-auto">
+                                <div class="flex items-center mb-8">
+                                    <div class="w-20 h-20 rounded-full bg-purple-900 flex items-center justify-center text-2xl font-bold mr-6" id="profileAvatar">US</div>
+                                    <div>
+                                        <h4 class="text-xl font-bold" id="profileName">User Name</h4>
+                                        <div class="text-gray-400 text-sm" id="profileWallet">0x742...d35f</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-6">
+                                    <label class="block text-gray-300 mb-2">Display Name</label>
+                                    <input type="text" class="w-full bg-gray-900 border border-purple-900 rounded-md px-4 py-2 text-white" placeholder="Your name">
+                                </div>
+                                
+                                <div class="mb-6">
+                                    <label class="block text-gray-300 mb-2">Bio</label>
+                                    <textarea class="w-full bg-gray-900 border border-purple-900 rounded-md px-4 py-2 text-white h-32" placeholder="Tell others about your skills and experience"></textarea>
+                                </div>
+                                
+                                <div class="mb-6">
+                                    <label class="block text-gray-300 mb-2">Profile Links</label>
+                                    <div class="space-y-3">
+                                        <div class="flex">
+                                            <select class="bg-gray-900 border border-purple-900 rounded-l-md px-4 py-2 text-white w-32">
+                                                <option>GitHub</option>
+                                                <option>Twitter</option>
+                                                <option>LinkedIn</option>
+                                                <option>Portfolio</option>
+                                            </select>
+                                            <input type="text" class="flex-1 bg-gray-900 border-t border-b border-r border-purple-900 rounded-r-md px-4 py-2 text-white" placeholder="URL">
+                                        </div>
+                                        <button class="text-blue-400 text-sm flex items-center">
+                                            <i class="fas fa-plus mr-1"></i> Add another link
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex justify-between">
+                                    <button class="gradient-border px-6 py-2 rounded-md text-white font-medium">
+                                        Save Changes
+                                    </button>
+                                    <button class="text-gray-400 hover:text-white text-sm font-medium">
+                                        Reset
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-black bg-opacity-50 border-t border-purple-900 mt-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-xl font-bold gradient-text mb-4">SkillProof</h3>
+                    <p class="text-gray-400">The future of verifiable credentials is decentralized, transparent, and user-owned.</p>
+                </div>
+                <div>
+                    <h4 class="text-lg font-bold mb-4">Product</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-blue-400">Features</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-blue-400">How It Works</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-blue-400">Pricing</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-blue-400">FAQ</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-lg font-bold mb-4">Resources</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-blue-400">Documentation</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-blue-400">Blog</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-blue-400">Community</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-blue-400">Support</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-lg font-bold mb-4">Connect</h4>
+                    <div class="flex space-x-4 mb-4">
+                        <a href="#" class="text-gray-400 hover:text-blue-400 text-xl"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-blue-400 text-xl"><i class="fab fa-discord"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-blue-400 text-xl"><i class="fab fa-github"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-blue-400 text-xl"><i class="fab fa-telegram"></i></a>
+                    </div>
+                    <button class="gradient-border px-4 py-2 rounded-md text-white font-medium">
+                        Contact Us
+                    </button>
+                </div>
+            </div>
+            <div class="border-t border-purple-900 mt-8 pt-8 text-center text-gray-500 text-sm">
+                <p>© 2023 SkillProof. All rights reserved. | <a href="#" class="hover:text-blue-400">Privacy Policy</a> | <a href="#" class="hover:text-blue-400">Terms of Service</a></p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile menu toggle
+        document.getElementById('mobileMenuBtn').addEventListener('click', function() {
+            const menu = document.getElementById('mobileMenu');
+            menu.classList.toggle('hidden');
+        });
+    
+        // API configuration
+        const API_BASE_URL = 'http://localhost:5000/api'; // Change to your backend URL
+    
+        // Authentication functions
+        const getAuthHeaders = () => {
+            const token = localStorage.getItem('skillproof_token');
+            return {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            };
+        };
+    
+        // Full authentication flow
+        const authenticateUser = async (walletAddress) => {
+            try {
+                // 1. Get nonce from backend
+                const nonceResponse = await fetch(`${API_BASE_URL}/auth/nonce/${walletAddress.toLowerCase()}`);
+                const { nonce } = await nonceResponse.json();
+                
+                // 2. Sign the nonce
+                const message = `I am signing my one-time nonce: ${nonce}`;
+                const signature = await window.ethereum.request({
+                    method: 'personal_sign',
+                    params: [message, walletAddress],
+                });
+                
+                // 3. Verify signature and get JWT
+                const authResponse = await fetch(`${API_BASE_URL}/auth/verify`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ walletAddress, signature })
+                });
+                
+                const { token, user } = await authResponse.json();
+                
+                // 4. Store the token securely
+                localStorage.setItem('skillproof_token', token);
+                
+                return { token, user };
+            } catch (error) {
+                console.error('Authentication failed:', error);
+                throw error;
+            }
+        };
+    
+        // Wallet connection with authentication
+        const connectWallet = async () => {
+            try {
+                if (window.ethereum) {
+                    // 1. Connect wallet
+                    const accounts = await window.ethereum.request({ 
+                        method: 'eth_requestAccounts' 
+                    });
+                    const walletAddress = accounts[0];
+                    
+                    // 2. Authenticate user
+                    const { token, user } = await authenticateUser(walletAddress);
+                    
+                    // 3. Show dashboard
+                    document.getElementById('dashboardContainer').classList.remove('hidden');
+                    
+                    // 4. Update wallet info
+                    document.getElementById('walletAddress').textContent = 
+                        walletAddress.substring(0, 6) + '...' + walletAddress.substring(38);
+                    document.getElementById('walletAvatar').textContent = 
+                        walletAddress.substring(2, 4).toUpperCase();
+                    document.getElementById('profileWallet').textContent = 
+                        walletAddress.substring(0, 6) + '...' + walletAddress.substring(38);
+                    document.getElementById('profileAvatar').textContent = 
+                        walletAddress.substring(2, 4).toUpperCase();
+                    
+                    // 5. Update user profile if available
+                    if (user) {
+                        document.getElementById('userName').textContent = 
+                            user.displayName || walletAddress.substring(0, 6) + '...';
+                        document.getElementById('profileName').value = 
+                            user.displayName || '';
+                        document.getElementById('profileBio').value = 
+                            user.bio || '';
+                    }
+                    
+                    // Close mobile menu if open
+                    document.getElementById('mobileMenu').classList.add('hidden');
+                    
+                    // Load user credentials
+                    loadUserCredentials(walletAddress);
+                } else {
+                    alert("Please install MetaMask!");
+                }
+            } catch (error) {
+                console.error("Error connecting wallet:", error);
+                alert("Failed to connect wallet. Please try again.");
+            }
+        };
+    
+        // Load user credentials
+        const loadUserCredentials = async (walletAddress) => {
+            try {
+                const response = await fetch(`${API_BASE_URL}/credentials/user/${walletAddress}`, {
+                    headers: getAuthHeaders()
+                });
+                
+                if (response.ok) {
+                    const credentials = await response.json();
+                    renderCredentials(credentials);
+                }
+            } catch (error) {
+                console.error('Error loading credentials:', error);
+            }
+        };
+    
+        // Render credentials in dashboard
+        const renderCredentials = (credentials) => {
+            const credentialsContainer = document.querySelector('#dashboardContent .grid');
+            if (!credentialsContainer) return;
+            
+            credentialsContainer.innerHTML = credentials.map(cred => `
+                <div class="skill-card gradient-border p-6 rounded-lg hover:neon-shadow transition-all">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <h4 class="text-lg font-bold">${cred.skill}</h4>
+                            <p class="text-gray-400 text-sm">
+                                Issued: ${new Date(cred.issuedAt).toLocaleDateString()}
+                            </p>
+                        </div>
+                        <div class="text-blue-400 text-2xl">
+                            <i class="${getSkillIcon(cred.category)}"></i>
+                        </div>
+                    </div>
+                    <p class="text-gray-300 mb-4">${cred.description || 'No description available'}</p>
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm bg-purple-900 bg-opacity-50 px-3 py-1 rounded-full">
+                            Level: ${cred.level}
+                        </span>
+                        <button 
+                            onclick="verifyCredential('${walletAddress}', '${cred.tokenId}')"
+                            class="text-blue-400 hover:text-blue-300 text-sm font-medium"
+                        >
+                            Verify
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        };
+    
+        // Helper function to get icon for skill category
+        const getSkillIcon = (category) => {
+            switch(category.toLowerCase()) {
+                case 'frontend': return 'fab fa-react';
+                case 'backend': return 'fas fa-server';
+                case 'blockchain': return 'fab fa-ethereum';
+                case 'devops': return 'fas fa-cloud';
+                case 'data': return 'fas fa-database';
+                default: return 'fas fa-code';
+            }
+        };
+    
+        // Verify credential
+        const verifyCredential = async (walletAddress, tokenId) => {
+            try {
+                const response = await fetch(`${API_BASE_URL}/verify/single`, {
+                    method: 'POST',
+                    headers: getAuthHeaders(),
+                    body: JSON.stringify({ walletAddress, tokenId })
+                });
+                
+                const result = await response.json();
+                if (result.verified) {
+                    alert('Credential verified on blockchain!');
+                } else {
+                    alert('Credential verification failed');
+                }
+            } catch (error) {
+                console.error('Verification failed:', error);
+                alert('Verification failed. Please try again.');
+            }
+        };
+    
+        // Connect wallet buttons
+        document.getElementById('connectWalletBtn').addEventListener('click', connectWallet);
+        document.getElementById('connectWalletBtnMobile').addEventListener('click', connectWallet);
+        document.getElementById('heroConnectBtn').addEventListener('click', connectWallet);
+    
+        // Disconnect wallet
+        document.getElementById('disconnectWalletBtn').addEventListener('click', function() {
+            localStorage.removeItem('skillproof_token');
+            document.getElementById('dashboardContainer').classList.add('hidden');
+        });
+    
+        // Close dashboard
+        document.getElementById('closeDashboardBtn').addEventListener('click', function() {
+            document.getElementById('dashboardContainer').classList.add('hidden');
+        });
+    
+        // Dashboard navigation
+        const showSection = (sectionId) => {
+            // Hide all sections
+            document.getElementById('dashboardContent').classList.add('hidden');
+            document.getElementById('mintContent').classList.add('hidden');
+            document.getElementById('verifierContent').classList.add('hidden');
+            document.getElementById('profileContent').classList.add('hidden');
+            
+            // Update title
+            document.getElementById('dashboardTitle').textContent = 
+                sectionId === 'dashboardContent' ? 'Dashboard' :
+                sectionId === 'mintContent' ? 'Mint Skill' :
+                sectionId === 'verifierContent' ? 'Verifier' : 'Profile';
+            
+            // Show selected section
+            document.getElementById(sectionId).classList.remove('hidden');
+        };
+    
+        document.getElementById('dashboardLink').addEventListener('click', (e) => {
+            e.preventDefault();
+            showSection('dashboardContent');
+        });
+    
+        document.getElementById('credentialsLink').addEventListener('click', (e) => {
+            e.preventDefault();
+            showSection('dashboardContent');
+        });
+    
+        document.getElementById('mintLink').addEventListener('click', (e) => {
+            e.preventDefault();
+            showSection('mintContent');
+        });
+    
+        document.getElementById('verifierLink').addEventListener('click', (e) => {
+            e.preventDefault();
+            showSection('verifierContent');
+        });
+    
+        document.getElementById('profileLink').addEventListener('click', (e) => {
+            e.preventDefault();
+            showSection('profileContent');
+        });
+    
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                
+                const targetId = this.getAttribute('href');
+                if (targetId === '#') return;
+                
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    targetElement.scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+    
+        // Check if user is already authenticated on page load
+        window.addEventListener('load', () => {
+            const token = localStorage.getItem('skillproof_token');
+            if (token) {
+                // You might want to verify token validity here
+                console.log('User is already authenticated');
+            }
+        });
+    </script>
+</body>
+</html>
