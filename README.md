@@ -56,16 +56,4 @@ SkillProof bridges the gap between learning and trust by providing a decentraliz
 - MetaMask or compatible Ethereum wallet  
 - Hardhat (for smart contract development)
 
-### Installation
 
-```bash
-git clone https://github.com/yourusername/skillproof.git
-cd skillproof
-
-# Install backend dependencies
-cd backend
-npm install
-
-# Install frontend dependencies
-cd ../frontend
-npm install
